@@ -1,0 +1,523 @@
+openapi: 3.0.0
+servers:
+  - url: https://api.waktusolat.app
+    description: Default server
+  - url: https://mpt-server.vercel.app/api
+    description: Same server, but on Vercel domain
+info:
+  description: |
+    Bahasa Melayu
+    # Pengenalan
+
+      Malaysia Waktu Solat API menyediakan data waktu solat yang tepat untuk kesemua tempat di Malaysia. Kami menyediakan maklumat seperti waktu solat bulanan, pengesanan zon berdasarkan koordinat dan lain-lain.
+
+    ## Bagaimana data waktu solat dikumpulkan
+
+      Kami mengumpulkan data dengan mengakses API dari laman [e-solat JAKIM](https://www.e-solat.gov.my/) dalam beberapa sela masa yang ditetapkan. Untuk mengekalkan kestabilan dan ketersediaan data sepanjang masa, kami menyimpan data tersebut
+      ke dalam pangkalan data kami. **Penafian:** Jakim e-solat API tidak didokumenkan secara rasmi, mungkin ia tidak direka untuk kegunaan luar, jadi terdapat risiko untuk struktur data berubah tanpa sebarang pemberitahuan.
+      Kami berusaha sedaya upaya kami untuk mengadaptasi supaya qualiti data dapat dikekalkan sepanjang masa. Untuk maklumat teknikal, sila lawati repository kami di https://github.com/mptwaktusolat/api-waktusolat
+
+    ## Penafian
+
+      Perkhidmatan Malaysia Waktu Solat API ini disediakan tanpa waranti, dan pengguna mengaksesnya atas risiko sendiri, mengakui bahawa perkhidmatan mungkin tidak bebas dari kesilapan, tidak sentiasa tersedia, atau selamat, dan penyedia tidak bertanggungjawab atas sebarang kerosakan yang timbul daripada penggunaannya.
+
+    ## Polisi Penggunaan Adil
+
+      Malaysia Waktu Solat API ini dibernarkan untuk kegunaan peribadi dan komersial. Penggunaan yang berlebihan atau penyalahgunaan API ini boleh mengakibatkan penggantungan akses sementara atau kekal. Pengguna digalakkan untuk menyimpan data secara 'local' untuk mengurangkan permintaan berulang.
+
+    ___
+    English
+
+    # Introduction
+
+      The Malaysia Waktu Solat API provides accurate prayer times (waktu solat) for various locations in Malaysia. It offers information on monthly prayer timings, zone detection based on coordinates and more.
+
+    ## How prayer time data is collected
+
+      We collect the data by tapping inside [JAKIM's e-solat](https://www.e-solat.gov.my/) API in some pre-determined frequency. To maintain stability and availability of this API, we store the data snapshot on our own database. **Disclaimer:** JAKIM API is undocumented and probably not meant to be used by the public, as it can change without prior notice. Hence, we try our
+      best to adapt for every new changes with the API to keep the data remains up to date every year. For more technical details, visit our repository at https://github.com/mptwaktusolat/api-waktusolat
+
+    ## Disclaimer
+
+      The Malaysia Waktu Solat API service is provided without warranty, and users access it at their own risk, acknowledging that the service may not be error-free, available at all times, or secure, and the provider is not liable for any damages arising from its use.
+
+    ## Fair Use Policy
+
+      The Malaysia Waktu Solat API is allowed for personal and commercial use. However, excessive use or abuse of the API may result in temporary or permanent suspension of access. Users are encouraged to cache data locally to minimize repeated requests.
+
+  version: 1.0.0
+  title: Waktu Solat API
+  contact:
+    name: Malaysia Prayer Time
+    email: mptwaktusolat@gmail.com
+    url: https://waktusolat.app
+  license:
+    name: MIT License
+    url: "https://opensource.org/license/mit/"
+tags:
+  - name: solat v2
+    description: Prayer time information (version 2)
+  - name: solat
+    description: Prayer time information
+  - name: zones
+    description: Zones and location information
+  - name: mosque
+    description: Mosque banner images
+  - name: Jadual Solat
+    description: Downloadable Prayer timtable in PDF
+x-tagGroups:
+  - name: Prayer times
+    tags:
+      - solat
+      - solat v2
+      - zones
+      - mosque
+paths:
+  /solat:
+    get:
+      tags:
+        - solat
+      summary: Prayer time for all zone
+      deprecated: true
+      description: Prayer time for all zone for current month
+      operationId: getAllPrayerTime
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Solat"
+  "/solat/{zone}":
+    get:
+      tags:
+        - solat
+      summary: Prayer time by zone
+      description: Return a list of Solat information for the current month for the given zone
+      operationId: getZonePrayerTime
+      deprecated: true
+      parameters:
+        - name: zone
+          in: path
+          description: Zone code. See list of zones code [here](/locations).
+          example: "sgr01"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Solat"
+        "404":
+          description: Solat not found
+  "/solat/{zone}/{day}":
+    get:
+      tags:
+        - solat
+      summary: Prayer time by zone
+      description: Return a list of Solat information for the current month in the given day for the given zone
+      operationId: getZoneTodayPrayerTime
+      deprecated: true
+      parameters:
+        - name: zone
+          in: path
+          description: Zone code. See list of zones code [here](/locations).
+          example: "sgr01"
+          required: true
+          schema:
+            type: string
+        - name: day
+          in: path
+          description: Day
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Solat"
+        "404":
+          description: Solat not found. You may have provided zone code that doesn't exist or out of range day number
+  "/v2/solat/{zone}":
+    get:
+      tags:
+        - solat v2
+      summary: Prayer time by zone
+      description: Return prayer times for the current month in the given day for the given zone.
+      operationId: getPrayerTime
+      parameters:
+        - name: zone
+          in: path
+          description: Zone code. See list of zones code [here](/locations).
+          example: "sgr01"
+          required: true
+          schema:
+            type: string
+        - name: year
+          in: query
+          description: "Year for prayer data. If empty, default to current year."
+          example: "2024"
+          schema:
+            type: integer
+        - name: month
+          in: query
+          description: "Month number (eg: `1` for January, `2` for February etc.). If empty, default to current month"
+          example: "3"
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SolatV2"
+        "404":
+          description: Data not found. Probably the solat data for the given month and year is not retrived yet. Please contact developer.
+        "500":
+          description: Error when parsing the parameter provided.
+  "/v2/solat/gps/{lat}/{long}":
+    get:
+      tags:
+        - solat v2
+      summary: Prayer time by GPS (Beta)
+      description: Return prayer times for the current month in the GPS coordinates (Latitude & Longitude)
+      operationId: getPrayerTime
+      parameters:
+        - name: lat
+          in: path
+          description: Latitude component
+          example: "3.25293"
+          required: true
+          schema:
+            type: number
+        - name: long
+          in: path
+          description: Longitude component
+          example: "101.73268"
+          required: true
+          schema:
+            type: number
+        - name: year
+          in: query
+          description: "Year for prayer data. If empty, default to current year."
+          example: "2024"
+          schema:
+            type: integer
+        - name: month
+          in: query
+          description: "Month number (eg: `1` for January, `2` for February etc.). If empty, default to current month"
+          example: "3"
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SolatV2"
+        "404":
+          description: Data not found. Probably the solat data for the given month and year is not retrived yet. Please contact developer.
+        "500":
+          description: Error when parsing the parameter provided.
+  /zones:
+    get:
+      tags:
+        - zones
+      summary: All zones
+      description: Return all zones information. See zones visually at https://peta.waktusolat.app
+      operationId: getAllZones
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Zones"
+        "500":
+          description: Internal Server Error. An error occured while processing your request
+  /zones/{zoneCode}:
+    get:
+      tags:
+        - zones
+      summary: Zones for the given state
+      description: Return zones information for the given zone code only. It is like a filter.
+      operationId: getFilteredZones
+      parameters:
+        - name: zoneCode
+          in: path
+          description: "Initial zone code. Eg: `prk`, `sgr` etc."
+          required: true
+          example: "prk"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Zones"
+        "404":
+          description: Provided zone code doesn't exist
+        "500":
+          description: Internal Server Error. An error occured while processing your request
+  /zones/gps:
+    get:
+      tags:
+        - zones
+      summary: Get zone by GPS coordinate
+      description: Return zone information for the given latitude and longitude
+      operationId: getZonesbyGps
+      parameters:
+        - name: lat
+          in: query
+          description: "Latitude"
+          example: "3.2485"
+          required: true
+          schema:
+            type: number
+        - name: long
+          in: query
+          description: "Longitude"
+          example: "101.739"
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleZone"
+        "400":
+          description: Please supply all the required parameters
+        "404":
+          description: No zone code found for the supplied coordinate
+        "500":
+          description: Internal Server Error. An error occured while processing your request
+  /mosque/{zoneCode}:
+    get:
+      tags:
+        - mosque
+      summary: Get mosque image for the given zone
+      description: "Return an image URL for the given zone. For example: `sgr` (Selangor) will give you SHAS IIUM Mosque. List for all images are listed [here](/mosques)"
+      operationId: getMosqueImage
+      parameters:
+        - name: zoneCode
+          in: path
+          description: "Initial zone code. Eg: `prk`, `sgr` etc."
+          required: true
+          example: sgr
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "405":
+          description: Invalid input
+  /jadual_solat:
+    get:
+      tags:
+        - Jadual Solat
+      summary: Get monthly prayer timetable
+      description: "Note: The request may take a little long time to process on the first call. Then, it will be cached on the CDN"
+      operationId: getMosqueImage
+      parameters:
+        - name: zone
+          in: query
+          description: "Zone code. Eg: `SBH01`, `WLY02`"
+          required: true
+          example: 'PRK01'
+          schema:
+            type: string
+        - name: year
+          in: query
+          description: "Year. If not defined, will use current year."
+          required: true
+          example: 2024
+          schema:
+            type: number
+        - name: month
+          in: query
+          description: "Month (1 = Jan, 2 = Feb, etc.) If not defined, will use the current monnth"
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+        "405":
+          description: Invalid input
+components:
+  schemas:
+    Solat:
+      type: object
+      properties:
+        prayerTime:
+          type: array
+          items:
+            type: object
+            properties:
+              hijri:
+                type: string
+                format: date
+                description: Hijri date
+                example: "1444-10-10"
+              date:
+                type: string
+                format: string
+                description: Gregorian date
+                example: "01-May-2023"
+              day:
+                type: string
+                description: Day of the week
+                example: "Monday"
+              imsak:
+                type: string
+                format: time
+                description: Imsak time
+                example: "05:44:00"
+              fajr:
+                type: string
+                format: time
+                description: Fajr time
+                example: "05:54:00"
+              syuruk:
+                type: string
+                format: time
+                description: Syuruk time
+                example: "07:02:00"
+              dhuhr:
+                type: string
+                format: time
+                description: Dhuhr time
+                example: "13:13:00"
+              asr:
+                type: string
+                format: time
+                description: Asr time
+                example: "16:31:00"
+              maghrib:
+                type: string
+                format: time
+                description: Maghrib time
+                example: "19:20:00"
+              isha:
+                type: string
+                format: time
+                description: Isha time
+                example: "20:31:00"
+    SolatV2:
+      type: object
+      properties:
+        zone:
+          type: string
+          example: SGR01
+        year:
+          type: integer
+          example: 2024
+        month:
+          type: string
+          description: Month name. All possible values - JAN | FEB | MAR | APR | MAY | JUN | JUL | AUG | SEP | OCT | NOV | DEC
+          example: MAR
+        last_updated:
+          type: string
+          format: date-time
+          example: "2024-02-15T02:46:55.209Z"
+        prayers:
+          type: array
+          items:
+            type: object
+            properties:
+              hijri:
+                type: string
+                format: date
+                description: Hijri date
+                example: "1445-08-20"
+              day:
+                type: integer
+                description: Day number for the month
+                example: 1
+              fajr:
+                type: integer
+                format: date-time
+                description: Epoch timestamp in seconds
+                example: 1709244960
+              syuruk:
+                type: integer
+                format: date-time
+                description: Epoch timestamp in seconds
+                example: 1709248920
+              dhuhr:
+                type: integer
+                format: date-time
+                description: Epoch timestamp in seconds
+                example: 1709270880
+              asr:
+                type: integer
+                format: date-time
+                description: Epoch timestamp in seconds
+                example: 1709282580
+              maghrib:
+                type: integer
+                format: date-time
+                description: Epoch timestamp in seconds
+                example: 1709292540
+              isha:
+                type: integer
+                format: date-time
+                description: Epoch timestamp in seconds
+                example: 1709296680
+    Zones:
+      type: array
+      items:
+        type: object
+        properties:
+          jakimCode:
+            type: string
+            description: Jakim code
+            example: "KDH01"
+          negeri:
+            type: string
+            description: State
+            example: "Kedah"
+          daerah:
+            type: string
+            description: District
+            example: "Kota Setar, Kubang Pasu, Pokok Sena"
+    SimpleZone:
+      type: object
+      properties:
+        state:
+          type: string
+          description: Negeri
+          example: "SGR"
+        district:
+          type: string
+          description: State
+          example: "Gombak"
+        zone:
+          type: string
+          description: Prayer time zone
+          example: "SGR01"

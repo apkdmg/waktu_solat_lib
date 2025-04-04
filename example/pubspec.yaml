@@ -1,0 +1,21 @@
+name: waktu_solat_lib_example
+description: Demonstrates how to use the waktu_solat_lib package.
+publish_to: 'none' # Prevent accidental publishing to pub.dev
+
+environment:
+  sdk: '>=3.0.0 <4.0.0' # Specify compatible Dart SDK versions
+
+dependencies:
+  flutter:
+    sdk: flutter
+  waktu_solat_lib:
+    path: ../
+  intl: ^0.19.0 # Add intl package for date/time formatting
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0 # Or your preferred linter version
+
+flutter:
+  uses-material-design: true
