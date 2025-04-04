@@ -198,6 +198,12 @@ final prayerTime = await client.getPrayerTimeByDateGps(latitude, longitude, spec
 
 These methods make it much easier to retrieve prayer times for a specific date without having to manually filter through the month's data.
 
+## Credits
+
+This library uses the [Malaysia Prayer Time API](https://api.waktusolat.app/docs) created by [Muhammad Fareez Iqmal](https://iqfareez.com/about), a Software Engineer specializing in Flutter, Laravel, and .NET technologies. The API provides accurate prayer times data for all locations in Malaysia.
+
+The data is collected from [e-solat JAKIM](https://www.e-solat.gov.my/) and stored in a database to maintain stability and availability. For more technical information, visit the API repository at [https://github.com/mptwaktusolat/api-waktusolat](https://github.com/mptwaktusolat/api-waktusolat).
+
 ## Error Handling
 
 The library throws `WaktuSolatApiException` for API errors, network issues, or parsing problems:
