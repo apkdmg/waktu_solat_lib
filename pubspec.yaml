@@ -1,9 +1,9 @@
 name: waktu_solat_lib
 description: "A Flutter package for accessing Malaysia prayer times (waktu solat) from the Waktu Solat API. Supports fetching prayer times by zone code or GPS coordinates, with automatic calculation of Imsak and Isyraq times."
 version: 1.0.0
-homepage: https://github.com/yourusername/waktu_solat_lib
-repository: https://github.com/yourusername/waktu_solat_lib
-issue_tracker: https://github.com/yourusername/waktu_solat_lib/issues
+homepage: https://github.com/apkdmg/waktu_solat_lib
+repository: https://github.com/apkdmg/waktu_solat_lib
+issue_tracker: https://github.com/apkdmg/waktu_solat_lib/issues
 
 # Additional metadata for pub.dev
 topics:

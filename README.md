@@ -221,5 +221,5 @@ try {
 
 - This package uses the public Waktu Solat API.
 - For a complete example, see the `/example` folder.
-- Contributions and bug reports are welcome on the [GitHub repository](https://github.com/yourusername/waktu_solat_lib).
+- Contributions and bug reports are welcome on the [GitHub repository](https://github.com/apkdmg/waktu_solat_lib).
 - This package is compatible with all platforms supported by Flutter (Android, iOS, Web, Windows, macOS, Linux).
