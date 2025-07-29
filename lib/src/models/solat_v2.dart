@@ -26,23 +26,29 @@ class SolatV2 {
   factory SolatV2.fromJson(Map<String, dynamic> json) {
     // Validate required top-level fields
     if (json['zone'] is! String) {
-      throw const FormatException('Invalid or missing field (zone) in SolatV2 JSON');
+      throw const FormatException(
+          'Invalid or missing field (zone) in SolatV2 JSON');
     }
 
     // Validate and parse the prayerTime list
     // API uses 'prayers', model uses 'prayerTime'
     if (json['prayers'] is! List || json['prayers'] == null) {
-      throw const FormatException('Missing or invalid field: prayers in SolatV2 JSON');
+      throw const FormatException(
+          'Missing or invalid field: prayers in SolatV2 JSON');
     }
     List<PrayerTime> prayerTimes = [];
     try {
       prayerTimes = (json['prayers'] as List) // Parse from 'prayers' key
           .map((item) => PrayerTime.fromJson(item as Map<String, dynamic>))
           .toList();
-    } on FormatException catch (e) { // Catch only FormatExceptions from PrayerTime.fromJson
-      throw FormatException('Failed to parse prayerTime list in SolatV2 JSON: $e');
-    } catch (e) { // Catch other potential errors during list processing
-      throw FormatException('An unexpected error occurred while parsing prayerTime list: $e');
+    } on FormatException catch (e) {
+      // Catch only FormatExceptions from PrayerTime.fromJson
+      throw FormatException(
+          'Failed to parse prayerTime list in SolatV2 JSON: $e');
+    } catch (e) {
+      // Catch other potential errors during list processing
+      throw FormatException(
+          'An unexpected error occurred while parsing prayerTime list: $e');
     }
 
     return SolatV2(

@@ -73,8 +73,10 @@ class WaktuSolatClient {
   ///   - Network errors (`ClientException`).
   ///   - JSON decoding errors (`FormatException`).
   ///   - Other unexpected errors.
-  Future<dynamic> _getRequest(String endpoint, {Map<String, String>? queryParameters}) async {
-    final url = Uri.parse('$_baseUrl$endpoint').replace(queryParameters: queryParameters);
+  Future<dynamic> _getRequest(String endpoint,
+      {Map<String, String>? queryParameters}) async {
+    final url = Uri.parse('$_baseUrl$endpoint')
+        .replace(queryParameters: queryParameters);
     http.Response response;
 
     try {
@@ -86,10 +88,8 @@ class WaktuSolatClient {
         try {
           final Map<String, dynamic> errorJson = jsonDecode(response.body);
           final apiError = ApiError.fromJson(errorJson);
-          throw WaktuSolatApiException(
-              'API Error: ${apiError.message}',
-              statusCode: response.statusCode,
-              apiError: apiError);
+          throw WaktuSolatApiException('API Error: ${apiError.message}',
+              statusCode: response.statusCode, apiError: apiError);
         } catch (_) {
           // If parsing errorJson fails or it's not the expected format
           throw WaktuSolatApiException(
@@ -102,9 +102,11 @@ class WaktuSolatClient {
       final jsonResponse = jsonDecode(response.body);
 
       // Handle potential API errors returned with 200 OK (check for "status":"error")
-      if (jsonResponse is Map<String, dynamic> && jsonResponse['status'] == 'error') {
+      if (jsonResponse is Map<String, dynamic> &&
+          jsonResponse['status'] == 'error') {
         final apiError = ApiError.fromJson(jsonResponse);
-        throw WaktuSolatApiException(apiError.message, statusCode: response.statusCode, apiError: apiError);
+        throw WaktuSolatApiException(apiError.message,
+            statusCode: response.statusCode, apiError: apiError);
       }
 
       return jsonResponse;
@@ -133,7 +135,8 @@ class WaktuSolatClient {
     if (response is List) {
       try {
         return response
-            .map((stateJson) => State.fromJson(stateJson as Map<String, dynamic>))
+            .map((stateJson) =>
+                State.fromJson(stateJson as Map<String, dynamic>))
             .toList();
       } catch (e) {
         // Handle potential parsing errors within the list
@@ -187,13 +190,15 @@ class WaktuSolatClient {
   ///
   /// Returns a `Future<SolatV2>` containing the prayer times and metadata upon success.
   /// Throws [WaktuSolatApiException] on failure (e.g., invalid zone, network error).
-  Future<SolatV2> getPrayerTimesByZone(String zone, {int? year, int? month}) async {
+  Future<SolatV2> getPrayerTimesByZone(String zone,
+      {int? year, int? month}) async {
     final Map<String, String> queryParameters = {};
     if (year != null) queryParameters['year'] = year.toString();
     if (month != null) queryParameters['month'] = month.toString();
 
     try {
-      final jsonResponse = await _getRequest('/v2/solat/$zone', queryParameters: queryParameters.isEmpty ? null : queryParameters);
+      final jsonResponse = await _getRequest('/v2/solat/$zone',
+          queryParameters: queryParameters.isEmpty ? null : queryParameters);
       // _getRequest now handles JSON parsing and basic API errors
       // We only need to handle the specific SolatV2.fromJson parsing here
       return SolatV2.fromJson(jsonResponse as Map<String, dynamic>);
@@ -220,15 +225,17 @@ class WaktuSolatClient {
   ///
   /// Returns a `Future<SolatV2>` containing the prayer times and metadata upon success.
   /// Throws [WaktuSolatApiException] on failure (e.g., invalid coordinates, network error).
-  Future<SolatV2> getPrayerTimesByGps(double latitude, double longitude, {int? year, int? month}) async {
+  Future<SolatV2> getPrayerTimesByGps(double latitude, double longitude,
+      {int? year, int? month}) async {
     final Map<String, String> queryParameters = {};
     if (year != null) queryParameters['year'] = year.toString();
     if (month != null) queryParameters['month'] = month.toString();
 
-    final endpoint = '/v2/solat/gps/$latitude/$longitude';
+    final endpoint = '/v2/solat/$latitude/$longitude';
 
     try {
-      final jsonResponse = await _getRequest(endpoint, queryParameters: queryParameters.isEmpty ? null : queryParameters);
+      final jsonResponse = await _getRequest(endpoint,
+          queryParameters: queryParameters.isEmpty ? null : queryParameters);
       // Use the same SolatV2 model, as the response structure is expected to be identical
       return SolatV2.fromJson(jsonResponse as Map<String, dynamic>);
     } on FormatException catch (e) {
@@ -263,19 +270,22 @@ class WaktuSolatClient {
 
     // Find the prayer time for the specific date
     // First try to match by the Gregorian date string (YYYY-MM-DD)
-    final dateString = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-    
+    final dateString =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
     // Look for a prayer time with a matching date string
     PrayerTime? prayerTime = solatV2.prayerTime.firstWhere(
       (pt) => pt.date == dateString,
-      orElse: () => PrayerTime(hijri: '', day: -1), // Dummy value to indicate not found
+      orElse: () =>
+          PrayerTime(hijri: '', day: -1), // Dummy value to indicate not found
     );
 
     // If not found by date string, try to find by day of month
     if (prayerTime.day == -1) {
       prayerTime = solatV2.prayerTime.firstWhere(
         (pt) => pt.day == day,
-        orElse: () => PrayerTime(hijri: '', day: -1), // Dummy value to indicate not found
+        orElse: () =>
+            PrayerTime(hijri: '', day: -1), // Dummy value to indicate not found
       );
     }
 
@@ -296,30 +306,35 @@ class WaktuSolatClient {
   /// Returns a `Future<PrayerTime>` containing the prayer times for the specified date upon success.
   /// Returns `null` if no prayer time is found for the specified date.
   /// Throws [WaktuSolatApiException] on failure (e.g., invalid coordinates, network error).
-  Future<PrayerTime?> getPrayerTimeByDateGps(double latitude, double longitude, DateTime date) async {
+  Future<PrayerTime?> getPrayerTimeByDateGps(
+      double latitude, double longitude, DateTime date) async {
     // Extract year and month from the date
     final year = date.year;
     final month = date.month;
     final day = date.day;
 
     // Get prayer times for the entire month
-    final solatV2 = await getPrayerTimesByGps(latitude, longitude, year: year, month: month);
+    final solatV2 = await getPrayerTimesByGps(latitude, longitude,
+        year: year, month: month);
 
     // Find the prayer time for the specific date
     // First try to match by the Gregorian date string (YYYY-MM-DD)
-    final dateString = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-    
+    final dateString =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
     // Look for a prayer time with a matching date string
     PrayerTime? prayerTime = solatV2.prayerTime.firstWhere(
       (pt) => pt.date == dateString,
-      orElse: () => PrayerTime(hijri: '', day: -1), // Dummy value to indicate not found
+      orElse: () =>
+          PrayerTime(hijri: '', day: -1), // Dummy value to indicate not found
     );
 
     // If not found by date string, try to find by day of month
     if (prayerTime.day == -1) {
       prayerTime = solatV2.prayerTime.firstWhere(
         (pt) => pt.day == day,
-        orElse: () => PrayerTime(hijri: '', day: -1), // Dummy value to indicate not found
+        orElse: () =>
+            PrayerTime(hijri: '', day: -1), // Dummy value to indicate not found
       );
     }
 

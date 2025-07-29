@@ -18,7 +18,7 @@ void main() {
 
     // Verify that the app title is displayed
     expect(find.text('Waktu Solat Lib Example'), findsOneWidget);
-    
+
     // Verify that the fetch buttons are present
     expect(find.text('Fetch Zones'), findsOneWidget);
     expect(find.text('Fetch Times (SGR01)'), findsOneWidget);

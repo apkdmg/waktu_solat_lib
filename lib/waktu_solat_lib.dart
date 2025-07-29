@@ -2,7 +2,8 @@
 library waktu_solat_lib;
 
 // Export the API client and exception
-export 'src/waktu_solat_client.dart' show WaktuSolatClient, WaktuSolatApiException;
+export 'src/waktu_solat_client.dart'
+    show WaktuSolatClient, WaktuSolatApiException;
 
 // Export the data models
 export 'src/models/prayer_time.dart' show PrayerTime;

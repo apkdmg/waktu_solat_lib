@@ -16,7 +16,8 @@ class State {
   factory State.fromJson(Map<String, dynamic> json) {
     // Basic validation
     if (json['negeri'] is! String || json['zones'] is! List) {
-      throw const FormatException('Invalid or missing fields (negeri, zones) in State JSON');
+      throw const FormatException(
+          'Invalid or missing fields (negeri, zones) in State JSON');
     }
 
     // Validate that zones list contains only strings
@@ -24,7 +25,8 @@ class State {
     try {
       zoneList = List<String>.from(json['zones'] as List);
     } catch (e) {
-      throw FormatException('Invalid items in zones list for State JSON. Expected List<String>. Error: $e');
+      throw FormatException(
+          'Invalid items in zones list for State JSON. Expected List<String>. Error: $e');
     }
 
     return State(

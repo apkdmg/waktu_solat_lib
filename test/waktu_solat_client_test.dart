@@ -21,11 +21,11 @@ class MockHttpClient extends http.BaseClient {
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final uri = request.url;
-    
+
     if (_exceptions.containsKey(uri)) {
       throw _exceptions[uri]!;
     }
-    
+
     if (_responses.containsKey(uri)) {
       final response = _responses[uri]!;
       return http.StreamedResponse(
@@ -34,7 +34,7 @@ class MockHttpClient extends http.BaseClient {
         headers: response.headers,
       );
     }
-    
+
     throw Exception('No mock response found for $uri');
   }
 }
@@ -63,7 +63,8 @@ void main() {
         ]
       ''';
 
-      test('returns a List<State> if the http call completes successfully', () async {
+      test('returns a List<State> if the http call completes successfully',
+          () async {
         // Arrange
         mockClient.mockGet(statesUri, http.Response(mockJsonResponse, 200));
 
@@ -79,29 +80,41 @@ void main() {
         expect(states[1].zones, contains('kdh01'));
       });
 
-      test('throws a WaktuSolatApiException if the http call returns an error status code', () async {
+      test(
+          'throws a WaktuSolatApiException if the http call returns an error status code',
+          () async {
         // Arrange
-        mockClient.mockGet(statesUri, http.Response('{"message":"Server Error"}', 500));
+        mockClient.mockGet(
+            statesUri, http.Response('{"message":"Server Error"}', 500));
 
         // Act & Assert
-        expect(() => client.getStates(), throwsA(isA<WaktuSolatApiException>()));
+        expect(
+            () => client.getStates(), throwsA(isA<WaktuSolatApiException>()));
       });
 
-      test('throws a WaktuSolatApiException if the http call throws ClientException', () async {
+      test(
+          'throws a WaktuSolatApiException if the http call throws ClientException',
+          () async {
         // Arrange
-        mockClient.mockGetError(statesUri, http.ClientException('Connection failed'));
+        mockClient.mockGetError(
+            statesUri, http.ClientException('Connection failed'));
 
         // Act & Assert
-        expect(() => client.getStates(), throwsA(isA<WaktuSolatApiException>()));
+        expect(
+            () => client.getStates(), throwsA(isA<WaktuSolatApiException>()));
       });
 
-      test('throws a WaktuSolatApiException if the response format is incorrect (not a list)', () async {
+      test(
+          'throws a WaktuSolatApiException if the response format is incorrect (not a list)',
+          () async {
         // Arrange
-        const badJsonResponse = '{"negeri":"JOHOR","zones":["jhr01"]}'; // map, not list
+        const badJsonResponse =
+            '{"negeri":"JOHOR","zones":["jhr01"]}'; // map, not list
         mockClient.mockGet(statesUri, http.Response(badJsonResponse, 200));
 
         // Act & Assert
-        expect(() => client.getStates(), throwsA(isA<WaktuSolatApiException>()));
+        expect(
+            () => client.getStates(), throwsA(isA<WaktuSolatApiException>()));
       });
     });
 
@@ -116,7 +129,8 @@ void main() {
         ]
       ''';
 
-      test('returns a List<ZoneInfo> if the http call completes successfully', () async {
+      test('returns a List<ZoneInfo> if the http call completes successfully',
+          () async {
         // Arrange
         mockClient.mockGet(zonesUri, http.Response(mockJsonResponse, 200));
 
@@ -132,17 +146,23 @@ void main() {
         expect(zones[3].jakimCode, 'sgr01');
       });
 
-      test('throws a WaktuSolatApiException if the http call returns an error status code', () async {
+      test(
+          'throws a WaktuSolatApiException if the http call returns an error status code',
+          () async {
         // Arrange
-        mockClient.mockGet(zonesUri, http.Response('{"message":"Not Found"}', 404));
+        mockClient.mockGet(
+            zonesUri, http.Response('{"message":"Not Found"}', 404));
 
         // Act & Assert
         expect(() => client.getZones(), throwsA(isA<WaktuSolatApiException>()));
       });
 
-      test('throws a WaktuSolatApiException if the http call throws ClientException', () async {
+      test(
+          'throws a WaktuSolatApiException if the http call throws ClientException',
+          () async {
         // Arrange
-        mockClient.mockGetError(zonesUri, http.ClientException('Network error'));
+        mockClient.mockGetError(
+            zonesUri, http.ClientException('Network error'));
 
         // Act & Assert
         expect(() => client.getZones(), throwsA(isA<WaktuSolatApiException>()));
@@ -152,7 +172,8 @@ void main() {
     group('getPrayerTimesByZone', () {
       const testZone = 'sgr01';
       final zoneUri = Uri.parse('$baseUrl/v2/solat/$testZone');
-      final zoneUriWithParams = Uri.parse('$baseUrl/v2/solat/$testZone?year=2025&month=3');
+      final zoneUriWithParams =
+          Uri.parse('$baseUrl/v2/solat/$testZone?year=2025&month=3');
 
       const successResponseJson = '''{
         "zone": "sgr01",
@@ -172,7 +193,7 @@ void main() {
           }
         ]
       }''';
-      
+
       const errorResponseJson = '''{
         "status": "error",
         "message": "Error, Zone not found, Please use /zones"
@@ -190,23 +211,27 @@ void main() {
         expect(result.prayerTime[0].date, '2025-03-01');
       });
 
-      test('returns SolatV2 on success with year/month params (200 OK)', () async {
-        mockClient.mockGet(zoneUriWithParams, http.Response(successResponseJson, 200));
+      test('returns SolatV2 on success with year/month params (200 OK)',
+          () async {
+        mockClient.mockGet(
+            zoneUriWithParams, http.Response(successResponseJson, 200));
 
-        final result = await client.getPrayerTimesByZone(testZone, year: 2025, month: 3);
+        final result =
+            await client.getPrayerTimesByZone(testZone, year: 2025, month: 3);
 
         expect(result, isA<SolatV2>());
         expect(result.zone, testZone);
       });
 
-      test('throws WaktuSolatApiException on API error (200 OK with error JSON)', () async {
+      test(
+          'throws WaktuSolatApiException on API error (200 OK with error JSON)',
+          () async {
         mockClient.mockGet(zoneUri, http.Response(errorResponseJson, 200));
 
         expect(
           () => client.getPrayerTimesByZone(testZone),
           throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.message, 'message', contains('Zone not found'))
-          ),
+              .having((e) => e.message, 'message', contains('Zone not found'))),
         );
       });
 
@@ -216,21 +241,23 @@ void main() {
         expect(
           () => client.getPrayerTimesByZone(testZone),
           throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.statusCode, 'statusCode', 500)
-            .having((e) => e.message, 'message', contains('API Request failed with status 500'))
-          ),
+              .having((e) => e.statusCode, 'statusCode', 500)
+              .having((e) => e.message, 'message',
+                  contains('API Request failed with status 500'))),
         );
       });
 
       test('throws WaktuSolatApiException on network error', () async {
         const exceptionMessage = 'Could not connect';
-        mockClient.mockGetError(zoneUri, http.ClientException(exceptionMessage));
+        mockClient.mockGetError(
+            zoneUri, http.ClientException(exceptionMessage));
 
         expect(
           () => client.getPrayerTimesByZone(testZone),
-          throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.message, 'message', contains('Network error: ClientException: $exceptionMessage'))
-          ),
+          throwsA(isA<WaktuSolatApiException>().having(
+              (e) => e.message,
+              'message',
+              contains('Network error: ClientException: $exceptionMessage'))),
         );
       });
 
@@ -239,21 +266,22 @@ void main() {
 
         expect(
           () => client.getPrayerTimesByZone(testZone),
-          throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.message, 'message', contains('Failed to parse API response'))
-          ),
+          throwsA(isA<WaktuSolatApiException>().having((e) => e.message,
+              'message', contains('Failed to parse API response'))),
         );
       });
 
-      test('throws WaktuSolatApiException on malformed success JSON (missing fields)', () async {
-        const malformedJson = '{"zone": "sgr01", "origin": "JAKIM"}'; // Missing prayers
+      test(
+          'throws WaktuSolatApiException on malformed success JSON (missing fields)',
+          () async {
+        const malformedJson =
+            '{"zone": "sgr01", "origin": "JAKIM"}'; // Missing prayers
         mockClient.mockGet(zoneUri, http.Response(malformedJson, 200));
 
         expect(
           () => client.getPrayerTimesByZone(testZone),
-          throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.message, 'message', contains('Failed to parse SolatV2 response'))
-          ),
+          throwsA(isA<WaktuSolatApiException>().having((e) => e.message,
+              'message', contains('Failed to parse SolatV2 response'))),
         );
       });
     });
@@ -262,7 +290,8 @@ void main() {
       const testLat = 3.0738;
       const testLong = 101.5183;
       final gpsUri = Uri.parse('$baseUrl/v2/solat/gps/$testLat/$testLong');
-      final gpsUriWithParams = Uri.parse('$baseUrl/v2/solat/gps/$testLat/$testLong?year=2025&month=3');
+      final gpsUriWithParams = Uri.parse(
+          '$baseUrl/v2/solat/gps/$testLat/$testLong?year=2025&month=3');
 
       const successResponseJsonGps = '''{
         "zone": "WLP01",
@@ -300,23 +329,27 @@ void main() {
         expect(result.prayerTime[0].date, '2025-03-01');
       });
 
-      test('returns SolatV2 on success with year/month params (200 OK)', () async {
-        mockClient.mockGet(gpsUriWithParams, http.Response(successResponseJsonGps, 200));
+      test('returns SolatV2 on success with year/month params (200 OK)',
+          () async {
+        mockClient.mockGet(
+            gpsUriWithParams, http.Response(successResponseJsonGps, 200));
 
-        final result = await client.getPrayerTimesByGps(testLat, testLong, year: 2025, month: 3);
+        final result = await client.getPrayerTimesByGps(testLat, testLong,
+            year: 2025, month: 3);
 
         expect(result, isA<SolatV2>());
         expect(result.zone, 'WLP01');
       });
 
-      test('throws WaktuSolatApiException on API error (200 OK with error JSON)', () async {
+      test(
+          'throws WaktuSolatApiException on API error (200 OK with error JSON)',
+          () async {
         mockClient.mockGet(gpsUri, http.Response(errorResponseJsonGps, 200));
 
         expect(
           () => client.getPrayerTimesByGps(testLat, testLong),
-          throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.message, 'message', contains('Invalid coordinates'))
-          ),
+          throwsA(isA<WaktuSolatApiException>().having(
+              (e) => e.message, 'message', contains('Invalid coordinates'))),
         );
       });
 
@@ -326,9 +359,9 @@ void main() {
         expect(
           () => client.getPrayerTimesByGps(testLat, testLong),
           throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.statusCode, 'statusCode', 500)
-            .having((e) => e.message, 'message', contains('API Request failed with status 500'))
-          ),
+              .having((e) => e.statusCode, 'statusCode', 500)
+              .having((e) => e.message, 'message',
+                  contains('API Request failed with status 500'))),
         );
       });
 
@@ -338,9 +371,10 @@ void main() {
 
         expect(
           () => client.getPrayerTimesByGps(testLat, testLong),
-          throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.message, 'message', contains('Network error: ClientException: $exceptionMessage'))
-          ),
+          throwsA(isA<WaktuSolatApiException>().having(
+              (e) => e.message,
+              'message',
+              contains('Network error: ClientException: $exceptionMessage'))),
         );
       });
 
@@ -349,21 +383,22 @@ void main() {
 
         expect(
           () => client.getPrayerTimesByGps(testLat, testLong),
-          throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.message, 'message', contains('Failed to parse API response'))
-          ),
+          throwsA(isA<WaktuSolatApiException>().having((e) => e.message,
+              'message', contains('Failed to parse API response'))),
         );
       });
 
-      test('throws WaktuSolatApiException on malformed success JSON (missing prayers)', () async {
-        const malformedJson = '{"zone": "WLP01", "origin": "JAKIM"}'; // Missing prayers
+      test(
+          'throws WaktuSolatApiException on malformed success JSON (missing prayers)',
+          () async {
+        const malformedJson =
+            '{"zone": "WLP01", "origin": "JAKIM"}'; // Missing prayers
         mockClient.mockGet(gpsUri, http.Response(malformedJson, 200));
 
         expect(
           () => client.getPrayerTimesByGps(testLat, testLong),
-          throwsA(isA<WaktuSolatApiException>()
-            .having((e) => e.message, 'message', contains('Failed to parse SolatV2'))
-          ),
+          throwsA(isA<WaktuSolatApiException>().having((e) => e.message,
+              'message', contains('Failed to parse SolatV2'))),
         );
       });
     });

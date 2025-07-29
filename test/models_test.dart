@@ -35,7 +35,8 @@ void main() {
         expect(prayerTime.maghrib, 1425529800);
         expect(prayerTime.isha, 1425533940);
         // Check that isyraq is calculated correctly (15 minutes after syuruk)
-        expect(prayerTime.isyraq, 1425486360); // syuruk + 15 minutes (900 seconds)
+        expect(
+            prayerTime.isyraq, 1425486360); // syuruk + 15 minutes (900 seconds)
       });
     });
 
@@ -81,11 +82,11 @@ void main() {
         expect(solatV2.prayerTime[0].date, '2025-03-01');
         expect(solatV2.prayerTime[0].day, 6); // Saturday
         expect(solatV2.prayerTime[1].day, 0); // Sunday
-        
+
         // Check that prayer times are parsed correctly
         expect(solatV2.prayerTime[0].fajr, 1425480480);
         expect(solatV2.prayerTime[0].syuruk, 1425485460);
-        
+
         // Check that isyraq is calculated correctly for both days
         expect(solatV2.prayerTime[0].isyraq, 1425486360); // syuruk + 15 minutes
         expect(solatV2.prayerTime[1].isyraq, 1425572760); // syuruk + 15 minutes
@@ -114,18 +115,17 @@ void main() {
     });
 
     group('ApiError', () {
-       test('fromJson parses valid JSON correctly', () {
-          const jsonString = '''{
+      test('fromJson parses valid JSON correctly', () {
+        const jsonString = '''{
             "status": "error",
             "message": "Error, Zone not found, Please use /zones"
           }''';
-          final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
-          final apiError = ApiError.fromJson(jsonMap);
+        final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
+        final apiError = ApiError.fromJson(jsonMap);
 
-          expect(apiError.status, 'error');
-          expect(apiError.message, 'Error, Zone not found, Please use /zones');
-       });
+        expect(apiError.status, 'error');
+        expect(apiError.message, 'Error, Zone not found, Please use /zones');
+      });
     });
-
   });
 }

@@ -161,7 +161,7 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
             ),
             const SizedBox(height: 10),
 
-            // --- Buttons --- 
+            // --- Buttons ---
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -169,19 +169,32 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
                 ElevatedButton(
                   onPressed: _isLoading ? null : _fetchZones,
                   child: _isLoading
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2))
                       : const Text('Fetch Zones'),
                 ),
                 ElevatedButton(
-                  onPressed: _isLoading ? null : () => _fetchPrayerTimesByZone('SGR01'), // Example zone
+                  onPressed: _isLoading
+                      ? null
+                      : () => _fetchPrayerTimesByZone('SGR01'), // Example zone
                   child: _isLoading
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2))
                       : const Text('Fetch Times (SGR01)'),
                 ),
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _fetchPrayerTimesByGps, // Placeholder coords
+                  onPressed: _isLoading
+                      ? null
+                      : _fetchPrayerTimesByGps, // Placeholder coords
                   child: _isLoading
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2))
                       : const Text('Fetch Times (GPS)'),
                 ),
               ],
@@ -203,7 +216,8 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           _error!,
-                          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -218,7 +232,8 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           _error!,
-                          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -227,7 +242,9 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
                     if (_isLoading)
                       const Center(child: CircularProgressIndicator())
                     else if (_prayerTimesZone != null)
-                      _buildPrayerTimeSection('Prayer Times (Zone: ${_prayerTimesZone!.zone})', _prayerTimesZone!),
+                      _buildPrayerTimeSection(
+                          'Prayer Times (Zone: ${_prayerTimesZone!.zone})',
+                          _prayerTimesZone!),
 
                     // Display Prayer Times (GPS)
                     if (_isLoading)
@@ -253,10 +270,12 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(title,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 5),
           // Display first few items or a summary for large lists
-          Text(items.take(10).join('\n')), 
+          Text(items.take(10).join('\n')),
           if (items.length > 10) const Text('...'),
         ],
       ),
@@ -270,7 +289,9 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(title,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 5),
           // Conditionally display origin if not null
           if (data.origin != null)
@@ -284,8 +305,7 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
             _buildPrayerTimeRow(data.prayerTime.first)
           ] else
             const Text('No prayer times data available.'),
-          if (data.prayerTime.length > 1)
-            const Text('...'),
+          if (data.prayerTime.length > 1) const Text('...'),
         ],
       ),
     );
@@ -299,7 +319,8 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
         return '--:--'; // Placeholder for missing times
       }
       try {
-        final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: false); // Assuming local time
+        final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000,
+            isUtc: false); // Assuming local time
         return DateFormat('HH:mm').format(dateTime);
       } catch (e) {
         // Handle potential errors during formatting (e.g., invalid timestamp)
@@ -313,13 +334,13 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
       // Display date if available, otherwise use Hijri date as fallback
       '${pt.date ?? pt.hijri} (${pt.day.toString()}): ' // Date (or Hijri fallback) and Day
       'Imsak ${formatTimestamp(pt.imsak)}, ' // Formatted times
-      'Fajr ${formatTimestamp(pt.fajr)}, ' 
-      'Syuruk ${formatTimestamp(pt.syuruk)}, ' 
+      'Fajr ${formatTimestamp(pt.fajr)}, '
+      'Syuruk ${formatTimestamp(pt.syuruk)}, '
       'Isyraq ${formatTimestamp(pt.isyraq)}, ' // Add Isyraq
-      'Dhuhr ${formatTimestamp(pt.dhuhr)}, ' 
-      'Asr ${formatTimestamp(pt.asr)}, ' 
-      'Maghrib ${formatTimestamp(pt.maghrib)}, ' 
-      'Isha ${formatTimestamp(pt.isha)}', 
+      'Dhuhr ${formatTimestamp(pt.dhuhr)}, '
+      'Asr ${formatTimestamp(pt.asr)}, '
+      'Maghrib ${formatTimestamp(pt.maghrib)}, '
+      'Isha ${formatTimestamp(pt.isha)}',
       style: const TextStyle(fontSize: 12),
     );
   }
@@ -327,8 +348,10 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
   // Helper widget to display ZoneInfo data
   Widget _buildZoneInfoList(List<waktu_solat.ZoneInfo> zones) {
     return ListView.builder(
-      shrinkWrap: true, // Re-add shrinkWrap as it will be inside SingleChildScrollView
-      physics: const NeverScrollableScrollPhysics(), // Re-add physics to disable nested scrolling
+      shrinkWrap:
+          true, // Re-add shrinkWrap as it will be inside SingleChildScrollView
+      physics:
+          const NeverScrollableScrollPhysics(), // Re-add physics to disable nested scrolling
       itemCount: zones.length,
       itemBuilder: (context, index) {
         final zone = zones[index];

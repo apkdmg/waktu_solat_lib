@@ -15,7 +15,7 @@ class ApiError {
   });
 
   /// Creates an [ApiError] instance from a JSON map.
-  /// 
+  ///
   /// Throws a [FormatException] if the JSON structure is invalid or missing required fields.
   factory ApiError.fromJson(Map<String, dynamic> json) {
     if (json['status'] is! String || json['message'] is! String) {

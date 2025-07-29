@@ -57,40 +57,59 @@ class PrayerTime {
     final requiredStringFields = ['hijri'];
     for (final field in requiredStringFields) {
       if (json[field] is! String) {
-        throw FormatException('Invalid or missing String field: $field in PrayerTime JSON');
+        throw FormatException(
+            'Invalid or missing String field: $field in PrayerTime JSON');
       }
     }
 
     // Validate nullable String field 'date'
-    if (json.containsKey('date') && json['date'] != null && json['date'] is! String) {
-      throw const FormatException('Invalid field type: date (must be String or null) in PrayerTime JSON');
+    if (json.containsKey('date') &&
+        json['date'] != null &&
+        json['date'] is! String) {
+      throw const FormatException(
+          'Invalid field type: date (must be String or null) in PrayerTime JSON');
     }
 
     // Validate Int fields
     final requiredIntFields = ['day'];
-    final nullableIntFields = ['imsak', 'fajr', 'syuruk', 'dhuhr', 'asr', 'maghrib', 'isha', 'isyraq'];
+    final nullableIntFields = [
+      'imsak',
+      'fajr',
+      'syuruk',
+      'dhuhr',
+      'asr',
+      'maghrib',
+      'isha',
+      'isyraq'
+    ];
 
     // Validate required int field 'day'
     for (final field in requiredIntFields) {
       if (json[field] is! int) {
-        throw FormatException('Invalid or missing Int field: $field in PrayerTime JSON (got ${json[field].runtimeType})');
+        throw FormatException(
+            'Invalid or missing Int field: $field in PrayerTime JSON (got ${json[field].runtimeType})');
       }
     }
 
     // Validate nullable int fields (prayer times)
     for (final field in nullableIntFields) {
       // Allow null, but if present, must be int (or string int for legacy)
-      if (json.containsKey(field) && json[field] != null && json[field] is! int) {
+      if (json.containsKey(field) &&
+          json[field] != null &&
+          json[field] is! int) {
         // Attempt conversion if it's a String representation of an int
         if (json[field] is String) {
           final parsedInt = int.tryParse(json[field] as String);
           if (parsedInt != null) {
-            json[field] = parsedInt; // Update json map in place if conversion successful
+            json[field] =
+                parsedInt; // Update json map in place if conversion successful
           } else {
-            throw FormatException('Invalid non-integer String field: $field in PrayerTime JSON');
+            throw FormatException(
+                'Invalid non-integer String field: $field in PrayerTime JSON');
           }
         } else {
-          throw FormatException('Invalid or missing Int field: $field in PrayerTime JSON (got ${json[field].runtimeType})');
+          throw FormatException(
+              'Invalid or missing Int field: $field in PrayerTime JSON (got ${json[field].runtimeType})');
         }
       }
     }
@@ -124,7 +143,7 @@ class PrayerTime {
     return PrayerTime(
       hijri: hijri!, // We validated hijri is not null earlier
       date: date,
-      day: day!,     // We validated day is not null earlier
+      day: day!, // We validated day is not null earlier
       imsak: finalImsak, // Use calculated or original imsak
       fajr: fajr,
       syuruk: syuruk,
