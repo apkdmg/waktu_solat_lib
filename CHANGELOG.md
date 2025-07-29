@@ -1,3 +1,8 @@
+## 1.0.1 - 2025-07-29
+
+* Fix GPS endpoint path
+* Fix pub.dev score: shorter description, correct repository URL.
+
 ## 1.0.0 - 2025-04-04
 
 * First stable release of the Waktu Solat Library
