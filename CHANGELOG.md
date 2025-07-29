@@ -1,3 +1,7 @@
+## 1.0.2 - 2025-07-29
+
+* Fix pubspec.yaml
+
 ## 1.0.1 - 2025-07-29
 
 * Fix GPS endpoint path

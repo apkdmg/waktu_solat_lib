@@ -1,6 +1,6 @@
 # Waktu Solat Library
 
-A Flutter package for accessing Malaysia prayer times (waktu solat) from the Waktu Solat API. This package provides easy access to prayer times by zone code or GPS coordinates.
+A Flutter package for accessing Malaysia prayer times (waktu solat) from the Waktu Solat API sourced from e-solat JAKIM. This package provides easy access to prayer times by zone code or GPS coordinates.
 
 ## Features
 

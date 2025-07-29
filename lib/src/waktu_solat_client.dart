@@ -29,7 +29,7 @@ class WaktuSolatApiException implements Exception {
   }
 }
 
-/// A client for interacting with the Waktu Solat API v2 (https://waktu-solat-api.readthedocs.io/en/latest/index.html).
+/// A client for interacting with the Waktu Solat API v2 (https://api.waktusolat.app/docs).
 ///
 /// Provides methods to fetch prayer times, state lists, and zone lists.
 class WaktuSolatClient {
