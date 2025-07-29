@@ -12,7 +12,6 @@ topics:
   - islamic
   - waktu-solat
   - jakim
-  - e-solat
 
 environment:
   sdk: '>=3.4.1 <4.0.0'
