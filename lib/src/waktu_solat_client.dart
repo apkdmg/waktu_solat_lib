@@ -231,7 +231,7 @@ class WaktuSolatClient {
     if (year != null) queryParameters['year'] = year.toString();
     if (month != null) queryParameters['month'] = month.toString();
 
-    final endpoint = '/v2/solat/$latitude/$longitude';
+    final endpoint = '/v2/solat/gps/$latitude/$longitude';
 
     try {
       final jsonResponse = await _getRequest(endpoint,
