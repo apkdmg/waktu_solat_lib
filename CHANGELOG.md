@@ -1,3 +1,8 @@
+## 1.0.3 - 2026-02-28
+
+* Fix `getPrayerTimesByGps` to call the documented endpoint path `/v2/solat/gps/{lat}/{long}`.
+* Add support for for Flutter `3.41.2` / Dart `3.11.0`.
+
 ## 1.0.2 - 2025-07-29
 
 * Fix pubspec.yaml
