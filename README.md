@@ -18,7 +18,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  waktu_solat_lib: ^0.0.1
+  waktu_solat_lib: ^1.0.3
 ```
 
 Then run:
