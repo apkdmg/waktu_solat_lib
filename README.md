@@ -208,6 +208,13 @@ try {
 }
 ```
 
+## Other platforms
+
+The same API client is also available as native libraries:
+
+- **Android / Kotlin:** [waktu_solat_android](https://github.com/apkdmg/waktu_solat_android), via JitPack (`com.github.apkdmg:waktu_solat_android`)
+- **iOS / macOS (Swift):** [WaktuSolatSwift](https://github.com/apkdmg/waktu_solat_swift), via Swift Package Manager or CocoaPods
+
 ## Additional Information
 
 - This package uses the public Waktu Solat API.
