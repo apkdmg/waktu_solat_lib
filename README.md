@@ -18,7 +18,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  waktu_solat_lib: ^1.0.3
+  waktu_solat_lib: ^1.0.4
 ```
 
 Then run:
@@ -40,28 +40,19 @@ final client = waktu_solat.WaktuSolatClient();
 
 ### Get all available states
 
-You can fetch a list of all available states (negeri) in Malaysia:
+You can fetch a list of all available states (negeri) in Malaysia, each with its zone codes. The list is built from the zones endpoint:
 
 ```dart
 final states = await client.getStates();
 
-// Example response:
-// [
-//   "Johor",
-//   "Kedah",
-//   "Kelantan",
-//   "Melaka",
-//   "Negeri Sembilan",
-//   "Pahang",
-//   "Perlis",
-//   "Pulau Pinang",
-//   "Perak",
-//   "Sabah",
-//   "Selangor",
-//   "Sarawak",
-//   "Terengganu",
-//   "Wilayah Persekutuan"
-// ]
+for (final state in states) {
+  print('${state.negeri}: ${state.zones}');
+}
+
+// Example output:
+// Johor: [JHR01, JHR02, JHR03, JHR04]
+// Kedah: [KDH01, KDH02, KDH03, KDH04, KDH05, KDH06, KDH07]
+// ...
 ```
 
 ### Get all available zone codes

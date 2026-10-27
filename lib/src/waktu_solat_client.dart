@@ -85,17 +85,14 @@ class WaktuSolatClient {
       // Check for non-200 status codes first
       if (response.statusCode >= 400) {
         // Try to parse as ApiError if possible, otherwise throw generic error
-        try {
-          final Map<String, dynamic> errorJson = jsonDecode(response.body);
-          final apiError = ApiError.fromJson(errorJson);
+        final apiError = _tryParseApiError(response.body);
+        if (apiError != null) {
           throw WaktuSolatApiException('API Error: ${apiError.message}',
               statusCode: response.statusCode, apiError: apiError);
-        } catch (_) {
-          // If parsing errorJson fails or it's not the expected format
-          throw WaktuSolatApiException(
-              'API Request failed with status ${response.statusCode}. Response: ${response.body}',
-              statusCode: response.statusCode);
         }
+        throw WaktuSolatApiException(
+            'API Request failed with status ${response.statusCode}. Response: ${response.body}',
+            statusCode: response.statusCode);
       }
 
       // Proceed to decode JSON only for successful (2xx) responses
@@ -123,30 +120,38 @@ class WaktuSolatClient {
     }
   }
 
+  /// Parses [body] as an [ApiError], or returns `null` if it isn't one.
+  ApiError? _tryParseApiError(String body) {
+    try {
+      final errorJson = jsonDecode(body);
+      if (errorJson is Map<String, dynamic>) {
+        return ApiError.fromJson(errorJson);
+      }
+    } on FormatException {
+      // Not JSON, or not in the ApiError shape
+    }
+    return null;
+  }
+
   /// Fetches the list of all Malaysian states and their corresponding zones.
   ///
-  /// Corresponds to the `/v2/negeri` endpoint.
+  /// The API no longer has a states endpoint (`/v2/negeri` returns 404), so
+  /// this groups the [getZones] response by [ZoneInfo.negeri], in the order
+  /// the API returns them.
   ///
   /// Returns a `Future<List<State>>` upon success.
   /// Throws [WaktuSolatApiException] on failure.
   Future<List<State>> getStates() async {
-    final response = await _getRequest('/v2/negeri');
+    final zones = await getZones();
 
-    if (response is List) {
-      try {
-        return response
-            .map((stateJson) =>
-                State.fromJson(stateJson as Map<String, dynamic>))
-            .toList();
-      } catch (e) {
-        // Handle potential parsing errors within the list
-        throw WaktuSolatApiException('Failed to parse states list: $e');
-      }
-    } else {
-      // Handle unexpected response format
-      throw WaktuSolatApiException(
-          'Unexpected response format received for /v2/negeri. Expected a List.');
+    final zonesByState = <String, List<String>>{};
+    for (final zone in zones) {
+      zonesByState.putIfAbsent(zone.negeri, () => []).add(zone.jakimCode);
     }
+
+    return zonesByState.entries
+        .map((entry) => State(negeri: entry.key, zones: entry.value))
+        .toList();
   }
 
   /// Fetches the list of all prayer zone information.

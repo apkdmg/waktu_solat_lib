@@ -1,3 +1,8 @@
+## 1.0.4 - 2026-10-27
+
+* Fix `getStates`: the API no longer serves `/v2/negeri` (it returns 404), so states are now built from `/zones` grouped by `negeri`. The state names now come back as the API spells them in `/zones` (e.g. `Johor` rather than `JOHOR`).
+* Fix error handling for HTTP 4xx/5xx responses: when the body is an API error (`{"status": "error", "message": ...}`), `WaktuSolatApiException` now carries it in `apiError` and says `API Error: <message>`, instead of always giving the generic "API Request failed" message.
+
 ## 1.0.3 - 2026-02-28
 
 * Fix `getPrayerTimesByGps` to call the documented endpoint path `/v2/solat/gps/{lat}/{long}`.

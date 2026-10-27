@@ -55,18 +55,21 @@ void main() {
 
   group('WaktuSolatClient', () {
     group('getStates', () {
-      final statesUri = Uri.parse('$baseUrl/v2/negeri');
+      // getStates is built from /zones, since the API no longer serves /v2/negeri.
+      final zonesUri = Uri.parse('$baseUrl/zones');
       const mockJsonResponse = '''
         [
-          {"negeri":"JOHOR","zones":["jhr01","jhr02","jhr03","jhr04"]},
-          {"negeri":"KEDAH","zones":["kdh01","kdh02","kdh03","kdh04","kdh05","kdh06","kdh07"]}
+          {"jakimCode":"JHR01","negeri":"Johor","daerah":"Pulau Aur dan Pulau Pemanggil"},
+          {"jakimCode":"JHR02","negeri":"Johor","daerah":"Johor Bahru, Kota Tinggi, Mersing, Kulai"},
+          {"jakimCode":"KDH01","negeri":"Kedah","daerah":"Kota Setar, Kubang Pasu, Pokok Sena"},
+          {"jakimCode":"KDH02","negeri":"Kedah","daerah":"Kuala Muda, Yan, Pendang"}
         ]
       ''';
 
-      test('returns a List<State> if the http call completes successfully',
+      test('groups zones by state if the http call completes successfully',
           () async {
         // Arrange
-        mockClient.mockGet(statesUri, http.Response(mockJsonResponse, 200));
+        mockClient.mockGet(zonesUri, http.Response(mockJsonResponse, 200));
 
         // Act
         final states = await client.getStates();
@@ -74,10 +77,10 @@ void main() {
         // Assert
         expect(states, isA<List<State>>());
         expect(states.length, 2);
-        expect(states[0].negeri, 'JOHOR');
-        expect(states[0].zones, contains('jhr01'));
-        expect(states[1].negeri, 'KEDAH');
-        expect(states[1].zones, contains('kdh01'));
+        expect(states[0].negeri, 'Johor');
+        expect(states[0].zones, ['JHR01', 'JHR02']);
+        expect(states[1].negeri, 'Kedah');
+        expect(states[1].zones, ['KDH01', 'KDH02']);
       });
 
       test(
@@ -85,11 +88,13 @@ void main() {
           () async {
         // Arrange
         mockClient.mockGet(
-            statesUri, http.Response('{"message":"Server Error"}', 500));
+            zonesUri, http.Response('{"message":"Server Error"}', 500));
 
         // Act & Assert
         expect(
-            () => client.getStates(), throwsA(isA<WaktuSolatApiException>()));
+            () => client.getStates(),
+            throwsA(isA<WaktuSolatApiException>()
+                .having((e) => e.statusCode, 'statusCode', 500)));
       });
 
       test(
@@ -97,7 +102,7 @@ void main() {
           () async {
         // Arrange
         mockClient.mockGetError(
-            statesUri, http.ClientException('Connection failed'));
+            zonesUri, http.ClientException('Connection failed'));
 
         // Act & Assert
         expect(
@@ -108,9 +113,8 @@ void main() {
           'throws a WaktuSolatApiException if the response format is incorrect (not a list)',
           () async {
         // Arrange
-        const badJsonResponse =
-            '{"negeri":"JOHOR","zones":["jhr01"]}'; // map, not list
-        mockClient.mockGet(statesUri, http.Response(badJsonResponse, 200));
+        const badJsonResponse = '{"jakimCode":"JHR01"}'; // map, not list
+        mockClient.mockGet(zonesUri, http.Response(badJsonResponse, 200));
 
         // Act & Assert
         expect(
@@ -232,6 +236,38 @@ void main() {
           () => client.getPrayerTimesByZone(testZone),
           throwsA(isA<WaktuSolatApiException>()
               .having((e) => e.message, 'message', contains('Zone not found'))),
+        );
+      });
+
+      test('includes the parsed ApiError on an error status code (404)',
+          () async {
+        mockClient.mockGet(
+            zoneUri,
+            http.Response(
+                '{"status": "error", "message": "Zone not found"}', 404));
+
+        expect(
+          () => client.getPrayerTimesByZone(testZone),
+          throwsA(isA<WaktuSolatApiException>()
+              .having((e) => e.statusCode, 'statusCode', 404)
+              .having((e) => e.message, 'message', 'API Error: Zone not found')
+              .having((e) => e.apiError?.status, 'apiError.status', 'error')),
+        );
+      });
+
+      test(
+          'falls back to a generic message when the error body is not an ApiError',
+          () async {
+        mockClient.mockGet(zoneUri,
+            http.Response('{"message": "No data found for zone: sgr01"}', 404));
+
+        expect(
+          () => client.getPrayerTimesByZone(testZone),
+          throwsA(isA<WaktuSolatApiException>()
+              .having((e) => e.statusCode, 'statusCode', 404)
+              .having((e) => e.apiError, 'apiError', isNull)
+              .having((e) => e.message, 'message',
+                  contains('API Request failed with status 404'))),
         );
       });
 
