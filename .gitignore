@@ -34,3 +34,7 @@ build/
 /waktu_solat_android/
 /waktu_solat_swift/
 /waktu_solat_tizen/
+/waktu_solat_webos/
+# Local research output
+/research_notes/
+/reports/
